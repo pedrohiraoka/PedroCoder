@@ -9,7 +9,7 @@ from datetime import datetime
 import streamlit as st
 import pandas as pd
 from duckduckgo_search import DDGS
-from duckduckgo_search.exceptions import RatelimitException
+from duckduckgo_search.exceptions import RatelimitException, DuckDuckGoSearchException
 
 st.set_page_config(page_title="DataHarvest", page_icon="📥", layout="wide")
 
@@ -28,8 +28,11 @@ def check_wget_installed():
         return False
 
 
+import time
+import random
+
 def search_files(query, file_types, max_results):
-    """Pesquisa arquivos no DuckDuckGo."""
+    """Pesquisa arquivos no DuckDuckGo com retry e throttling."""
     if not file_types:
         return []
     
@@ -38,26 +41,61 @@ def search_files(query, file_types, max_results):
     valid_exts = [EXTENSIONS[ft] for ft in file_types if ft in EXTENSIONS]
     
     results = []
-    try:
-        with DDGS() as ddgs:
-            for result in ddgs.text(full_query, max_results=max_results):
-                url = result.get('href', '')
-                url_lower = url.lower()
+    user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
+    ]
+    
+    max_retries = 3
+    base_delay = 2
+    
+    for attempt in range(max_retries):
+        try:
+            # Throttling entre tentativas
+            if attempt > 0:
+                delay = base_delay * (2 ** attempt) + random.uniform(0.5, 1.5)
+                st.info(f"⏳ Aguardando {delay:.1f}s antes de tentar novamente...")
+                time.sleep(delay)
+            
+            with DDGS(timeout=10) as ddgs:
+                # User-Agent aleatório para evitar rate limit
+                ddgs._headers['User-Agent'] = random.choice(user_agents)
                 
-                for ext in valid_exts:
-                    if url_lower.endswith(ext):
-                        filename = os.path.basename(url.split('?')[0]) or f"arquivo_{len(results)+1}{ext}"
-                        results.append({
-                            "Nome do Arquivo": filename,
-                            "URL": url,
-                            "Tipo": ext[1:].upper(),
-                            "status": "🔍 Detectado"
-                        })
+                for result in ddgs.text(full_query, max_results=max_results * 2):
+                    url = result.get('href', '')
+                    url_lower = url.lower()
+                    
+                    for ext in valid_exts:
+                        if url_lower.endswith(ext):
+                            filename = os.path.basename(url.split('?')[0]) or f"arquivo_{len(results)+1}{ext}"
+                            results.append({
+                                "Nome do Arquivo": filename,
+                                "URL": url,
+                                "Tipo": ext[1:].upper(),
+                                "status": "🔍 Detectado"
+                            })
+                            break
+                    
+                    if len(results) >= max_results:
                         break
-    except RatelimitException:
-        st.warning("Serviço temporariamente indisponível. Tente novamente.")
-    except Exception as e:
-        st.error(f"Erro na busca: {e}")
+            
+            # Sucesso - sai do loop de retries
+            break
+            
+        except RatelimitException:
+            if attempt == max_retries - 1:
+                st.warning("⚠️ Limite de requisições atingido. Aguarde alguns minutos antes de buscar novamente.")
+                return []
+            continue
+        except DuckDuckGoSearchException as e:
+            st.warning(f"⚠️ Erro na busca: {str(e)}")
+            return []
+        except Exception as e:
+            if attempt == max_retries - 1:
+                st.error(f"❌ Erro inesperado: {str(e)}")
+                return []
+            continue
     
     return results
 
