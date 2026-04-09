@@ -4,12 +4,11 @@ import subprocess
 import os
 import shlex
 import time
+import json
 from datetime import datetime
 
 import streamlit as st
 import pandas as pd
-from duckduckgo_search import DDGS
-from duckduckgo_search.exceptions import RatelimitException, DuckDuckGoSearchException
 
 st.set_page_config(page_title="DataHarvest", page_icon="📥", layout="wide")
 
@@ -28,36 +27,49 @@ def check_wget_installed():
         return False
 
 
-import time
-
 def search_files(query, file_types, max_results):
-    """Pesquisa arquivos no DuckDuckGo com retry e throttling."""
+    """Pesquisa arquivos usando ddgs CLI com suporte a retry."""
     if not file_types:
         return []
     
     filetype_query = " OR ".join([f"filetype:{ft.lower()}" for ft in file_types])
     full_query = f"{query} ({filetype_query})"
-    valid_exts = [EXTENSIONS[ft] for ft in file_types if ft in EXTENSIONS]
-    
-    results = []
+    valid_exts = [EXTENSIONS[ft].lower() for ft in file_types if ft in EXTENSIONS]
     
     max_retries = 3
     base_delay = 2
     
     for attempt in range(max_retries):
         try:
-            # Throttling entre tentativas
             if attempt > 0:
                 delay = base_delay * (2 ** attempt)
                 st.info(f"⏳ Aguardando {delay}s antes de tentar novamente...")
                 time.sleep(delay)
             
-            with DDGS(timeout=10) as ddgs:
-                # Versões recentes da duckduckgo-search (v7+) não expõem _headers
-                # A biblioteca gerencia headers internamente
+            # Usa ddgs CLI diretamente (mais robusto contra rate limits)
+            # Nota: ddgs v7+ usa -k para keywords
+            cmd = ["ddgs", "text", "-k", full_query, "-m", str(max_results * 2), "--backend", "lite"]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode != 0:
+                if "ratelimit" in result.stderr.lower() or "202" in result.stderr or "418" in result.stderr:
+                    if attempt == max_retries - 1:
+                        st.warning("⚠️ Limite de requisições atingido. Aguarde alguns minutos.")
+                        return []
+                    continue
+                raise Exception(result.stderr)
+            
+            # Parse da saída texto do ddgs (formato: "N. title\\nhref\\nbody")
+            results = []
+            lines = result.stdout.strip().split('\n')
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
                 
-                for result in ddgs.text(full_query, max_results=max_results * 2):
-                    url = result.get('href', '')
+                if line.startswith('href'):
+                    url = line.split(':', 1)[1].strip() if ':' in line else ''
                     url_lower = url.lower()
                     
                     for ext in valid_exts:
@@ -74,24 +86,20 @@ def search_files(query, file_types, max_results):
                     if len(results) >= max_results:
                         break
             
-            # Sucesso - sai do loop de retries
-            break
+            return results
             
-        except RatelimitException:
+        except subprocess.TimeoutExpired:
             if attempt == max_retries - 1:
-                st.warning("⚠️ Limite de requisições atingido. Aguarde alguns minutos antes de buscar novamente.")
+                st.error("❌ Timeout na busca. Tente novamente.")
                 return []
             continue
-        except DuckDuckGoSearchException as e:
-            st.warning(f"⚠️ Erro na busca: {str(e)}")
-            return []
         except Exception as e:
             if attempt == max_retries - 1:
-                st.error(f"❌ Erro inesperado: {str(e)}")
+                st.error(f"❌ Erro na busca: {str(e)}")
                 return []
             continue
     
-    return results
+    return []
 
 
 def download_files(df, download_dir, log_container):
@@ -124,7 +132,10 @@ def download_files(df, download_dir, log_container):
             
             process.wait(timeout=300)
             df.loc[idx, 'status'] = "✅ Concluído" if process.returncode == 0 else "❌ Erro"
-            log_container.success(f"   ✅ {filename}") if process.returncode == 0 else log_container.error(f"   ❌ {filename}")
+            if process.returncode == 0:
+                log_container.success(f"   ✅ {filename}")
+            else:
+                log_container.error(f"   ❌ {filename}")
         except Exception as e:
             df.loc[idx, 'status'] = "❌ Erro"
             log_container.error(f"   ❌ {str(e)}")
