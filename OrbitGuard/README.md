@@ -147,22 +147,42 @@ print(resultado.asteroids_nearby)
 
 ```text
 OrbitGuard/
-├── app.py                 # Interface Streamlit principal
-├── cli.py                 # Interface de linha de comando (Typer)
-├── core/
-│   ├── validator.py       # Lógica de validação de falsos positivos
-│   ├── ephemeris.py       # Cálculo de efemérides e ocultações
-│   ├── catalog.py         # Wrappers para APIs externas
-│   └── cross_match.py     # Processamento batch e cruzamento de dados
-├── utils/
-│   ├── cache.py           # Gerenciamento de cache local (SQLite/Parquet)
-│   └── config.py          # Constantes, limites de API e configurações
-├── tests/                 # Testes unitários com pytest
-├── notebooks/             # Prototipagem e validação de APIs
-├── requirements.txt       # Dependências Python
-├── environment.yml        # Ambiente Conda (opcional)
-└── README.md              # Este arquivo
+├── app.py                      # Interface Streamlit principal (Dashboard Web)
+├── cli.py                      # Interface de Linha de Comando (Typer CLI)
+├── core/                       # Módulos principais do sistema
+│   ├── __init__.py            # Exportações do pacote core
+│   ├── catalog.py             # Wrapper para APIs (NASA Exoplanet Archive, Lightkurve, JPL Horizons)
+│   ├── validator.py           # Módulo 1: Validador de Trânsito (Falsos Positivos)
+│   ├── ephemeris.py           # Módulo 2: Cálculo de Efemérides e Ocultações
+│   └── cross_match.py         # Módulo 3: Processamento Batch e Detecção de Eventos Cruzados
+├── utils/                      # Utilitários e configurações
+│   ├── __init__.py            # Exportações do pacote utils
+│   ├── cache.py               # Gerenciamento de Cache Local (SQLite/Parquet)
+│   └── config.py              # Constantes, Limites de API, Paths
+├── tests/                      # Testes Unitários e de Integração
+│   ├── __init__.py
+│   └── test_core.py           # Testes dos módulos principais
+├── notebooks/                  # Prototipagem e Validação de APIs
+│   └── __init__.py
+├── orbitguard_cache/           # Diretório de Cache (gerado automaticamente)
+│   └── catalog_cache.db       # Banco de dados SQLite de cache
+├── requirements.txt            # Dependências Python
+├── README.md                   # Este arquivo
+└── .gitignore                  # Arquivos ignorados pelo Git
 ```
+
+### Descrição dos Arquivos Principais
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `app.py` | Dashboard interativo Streamlit com 3 abas (Validador, Ocultações, Batch) |
+| `cli.py` | CLI completa com comandos `validate`, `occult`, `batch`, `info`, `clear-cache` |
+| `core/catalog.py` | Classes `ExoplanetCatalog`, `LightCurveSearch`, `JPLHorizonsQuery` |
+| `core/validator.py` | Classe `TransitValidator` e `ValidationResult` para validação de trânsitos |
+| `core/ephemeris.py` | Classes `EphemerisCalculator` e `OccultationPrioritizer` |
+| `core/cross_match.py` | Classe `BatchCrossMatcher` para processamento paralelo em lote |
+| `utils/cache.py` | Sistema de cache inteligente com TTL e persistência SQLite |
+| `utils/config.py` | Configurações globais, limites de API e constantes |
 
 ---
 
