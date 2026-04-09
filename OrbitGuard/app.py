@@ -25,7 +25,7 @@ from core.validator import TransitValidator, ValidationResult
 from core.ephemeris import EphemerisCalculator, OccultationPrioritizer
 from core.cross_match import BatchCrossMatcher, CrossMatchResult
 from utils.cache import CacheManager
-from utils.config import Config, API_LIMITS
+from utils.config import Config, config
 
 # Configuração da página
 st.set_page_config(

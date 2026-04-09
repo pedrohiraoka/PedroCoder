@@ -22,9 +22,9 @@ try:
 except ImportError as e:
     logging.warning(f"astroquery não disponível: {e}")
 
-from .catalog import JPLHorizonsQuery, ExoplanetCatalog
+from .catalog import CatalogAPI, ExoplanetData, AsteroidData
 from ..utils.cache import CacheManager
-from ..utils.config import Config, API_LIMITS
+from ..utils.config import Config, config
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,7 @@ class EphemerisCalculator:
         """
         self.cache_manager = cache_manager or CacheManager()
         self.default_step = default_step * u.minute
-        self.horizons_query = JPLHorizonsQuery()
+        self.catalog_api = CatalogAPI()
 
     def get_ephemeris(
         self,
@@ -284,7 +284,7 @@ class OccultationPrioritizer:
             exoplanet_catalog: Catálogo de exoplanetas para cruzamento
         """
         self.cache_manager = cache_manager or CacheManager()
-        self.exoplanet_catalog = exoplanet_catalog or ExoplanetCatalog()
+        self.catalog_api = CatalogAPI()
         self.ephemeris_calc = EphemerisCalculator(cache_manager=self.cache_manager)
 
     def find_occultations(

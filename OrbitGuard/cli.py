@@ -364,8 +364,8 @@ def show_info():
     typer.echo("🔭 OrbitGuard - Informações")
     typer.echo("=" * 60)
     
-    typer.echo(f"\nVersão: {Config.VERSION}")
-    typer.echo(f"Cache path: {Config.CACHE_PATH}")
+    typer.echo(f"\nVersão: 1.0.0")
+    typer.echo(f"Cache path: {config.cache_db_path.parent}")
     
     # Stats do cache
     cache_stats = cache_manager.get_stats()
@@ -374,8 +374,9 @@ def show_info():
     typer.echo(f"   Entradas: {cache_stats.get('entries', 0)}")
     
     typer.echo(f"\n⚙️ Limites de API:")
-    for api, limit in Config.API_LIMITS.items():
-        typer.echo(f"   {api}: {limit} req/min")
+    typer.echo(f"   JPL Horizons: {config.JPL_HORIZONS_RATE_LIMIT} req/min")
+    typer.echo(f"   Exoplanet Archive: {config.EXOPLANET_ARCHIVE_RATE_LIMIT} req/min")
+    typer.echo(f"   Gaia: {config.GAIA_RATE_LIMIT} req/min")
     
     typer.echo("\n📚 Documentação: https://github.com/orbitguard/docs")
 

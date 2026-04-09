@@ -5,11 +5,10 @@ Utilitários para cache, configuração e funções auxiliares.
 """
 
 from .cache import CacheManager
-from .config import Config, API_LIMITS, CACHE_PATH
+from .config import Config, config
 
 __all__ = [
     "CacheManager",
     "Config",
-    "API_LIMITS",
-    "CACHE_PATH",
+    "config",
 ]
