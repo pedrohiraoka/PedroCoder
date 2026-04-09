@@ -1,0 +1,55 @@
+{
+  "data_shape": [
+    200,
+    8
+  ],
+  "n_columns": 8,
+  "n_hypotheses": 1,
+  "hypotheses": [
+    {
+      "hypothesis": "A distribuição de 'renda' é assimétrica à direita (coeficiente de assimetria = 1.273), sugerindo que valores extremos podem influenciar análises.",
+      "variable_1": "renda",
+      "variable_2": null,
+      "relationship_type": "distribution",
+      "observed_strength": 1.27321630247,
+      "evidence": "Assimetria de 1.273 detectada"
+    }
+  ],
+  "test_plans": [
+    {
+      "hypothesis": "A distribuição de 'renda' é assimétrica à direita (coeficiente de assimetria = 1.273), sugerindo que valores extremos podem influenciar análises.",
+      "test": {
+        "name": "Teste de Correlação de Spearman",
+        "description": "Mede a correlação monotônica entre duas variáveis (não-paramétrico).",
+        "use_case": "Variáveis ordinais ou contínuas não-normais, relação monotônica.",
+        "assumptions": [
+          "Variáveis são pelo menos ordinais",
+          "Relação monotônica entre as variáveis",
+          "Não assume normalidade"
+        ],
+        "implementation_hint": "scipy.stats.spearmanr(x, y)"
+      },
+      "sampling_plan": {
+        "method": "Amostragem Aleatória Simples",
+        "description": "Selecione observações aleatoriamente da população com igual probabilidade. Use randomização verdadeira para evitar viés de seleção.",
+        "recommended_sample_size": 29,
+        "justification": "Baseado em poder estatístico de 80%, alpha de 5%, e tamanho de efeito médio (d=0.5). Para detectar efeitos menores, aumente o tamanho da amostra."
+      },
+      "success_metrics": {
+        "primary_metric": "Coeficiente de assimetria (skewness)",
+        "threshold": "|skewness| > 0.5 indica assimetria moderada",
+        "interpretation": "skewness > 0: assimetria à direita; skewness < 0: assimetria à esquerda. |skewness| > 1: assimetria forte.",
+        "secondary_metrics": [
+          "Teste de normalidade (Shapiro-Wilk)",
+          "Kurtose"
+        ]
+      },
+      "additional_recommendations": [
+        "Verifique os pressupostos do teste antes de aplicar.",
+        "Considere correções para múltiplas comparações se testar várias hipóteses.",
+        "Documente qualquer exclusão de dados ou tratamento de outliers.",
+        "Reporte intervalos de confiança junto com estimativas pontuais."
+      ]
+    }
+  ]
+}
