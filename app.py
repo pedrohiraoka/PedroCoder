@@ -28,7 +28,7 @@ def check_wget_installed():
 
 
 def search_files(query, file_types, max_results):
-    """Pesquisa arquivos usando ddgs CLI com suporte a retry."""
+    """Pesquisa arquivos usando ddgs CLI com parsing robusto."""
     if not file_types:
         return []
     
@@ -46,56 +46,96 @@ def search_files(query, file_types, max_results):
                 st.info(f"⏳ Aguardando {delay}s antes de tentar novamente...")
                 time.sleep(delay)
             
-            # Usa ddgs CLI diretamente (mais robusto contra rate limits)
-            # Nota: ddgs v7+ usa -k para keywords
-            cmd = ["ddgs", "text", "-k", full_query, "-m", str(max_results * 2), "--backend", "lite"]
+            # Usa ddgs CLI diretamente - tenta JSON primeiro
+            cmd = ["ddgs", "text", "-k", full_query, "-m", str(max_results * 3)]
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
             
             if result.returncode != 0:
-                if "ratelimit" in result.stderr.lower() or "202" in result.stderr or "418" in result.stderr:
+                error_lower = result.stderr.lower()
+                if "ratelimit" in error_lower or "202" in result.stderr or "418" in result.stderr:
                     if attempt == max_retries - 1:
                         st.warning("⚠️ Limite de requisições atingido. Aguarde alguns minutos.")
                         return []
                     continue
-                raise Exception(result.stderr)
+                if attempt == max_retries - 1:
+                    raise Exception(result.stderr)
+                continue
             
-            # Parse da saída texto do ddgs (formato: "N. title\\nhref\\nbody")
+            # Tenta parsear como JSON (formato padrão do ddgs)
             results = []
-            lines = result.stdout.strip().split('\n')
+            seen_urls = set()
             
-            for line in lines:
-                line = line.strip()
-                if not line:
+            try:
+                data = json.loads(result.stdout)
+                if isinstance(data, list):
+                    raw_items = data
+                elif isinstance(data, dict) and 'results' in data:
+                    raw_items = data['results']
+                else:
+                    raw_items = []
+            except json.JSONDecodeError:
+                # Fallback: parse texto bruto
+                raw_items = []
+                lines = result.stdout.strip().split('\n')
+                current_item = {}
+                for line in lines:
+                    line = line.strip()
+                    if not line:
+                        if current_item:
+                            raw_items.append(current_item)
+                            current_item = {}
+                        continue
+                    if line.startswith('href:'):
+                        current_item['href'] = line.split(':', 1)[1].strip()
+                    elif line.startswith('title:'):
+                        current_item['title'] = line.split(':', 1)[1].strip()
+                    elif 'href' not in current_item and line.startswith('http'):
+                        current_item['href'] = line
+                if current_item:
+                    raw_items.append(current_item)
+            
+            # Filtra URLs por extensão
+            for item in raw_items:
+                url = item.get('href') or item.get('url', '')
+                if not url:
                     continue
                 
-                if line.startswith('href'):
-                    url = line.split(':', 1)[1].strip() if ':' in line else ''
-                    url_lower = url.lower()
-                    
-                    for ext in valid_exts:
-                        if url_lower.endswith(ext):
-                            filename = os.path.basename(url.split('?')[0]) or f"arquivo_{len(results)+1}{ext}"
+                url_clean = url.split('?')[0].split('#')[0].lower()
+                
+                for ext in valid_exts:
+                    if url_clean.endswith(ext):
+                        if url not in seen_urls:
+                            seen_urls.add(url)
+                            filename = os.path.basename(url.split('?')[0])
+                            if not filename or filename == '/':
+                                filename = f"arquivo_{len(results)+1}{ext}"
+                            
                             results.append({
                                 "Nome do Arquivo": filename,
                                 "URL": url,
                                 "Tipo": ext[1:].upper(),
                                 "status": "🔍 Detectado"
                             })
-                            break
-                    
-                    if len(results) >= max_results:
                         break
+                
+                if len(results) >= max_results:
+                    break
+            
+            if not results and raw_items:
+                st.info(f"⚠️ {len(raw_items)} resultados encontrados, mas nenhum era arquivo direto. Tente adicionar a extensão no termo de busca (ex: 'relatorio pdf').")
             
             return results
             
         except subprocess.TimeoutExpired:
             if attempt == max_retries - 1:
-                st.error("❌ Timeout na busca. Tente novamente.")
+                st.error("❌ Timeout na busca. Tente reduzir o número de resultados.")
                 return []
             continue
         except Exception as e:
             if attempt == max_retries - 1:
                 st.error(f"❌ Erro na busca: {str(e)}")
+                with st.expander("Ver detalhes"):
+                    st.code(str(e))
                 return []
             continue
     
