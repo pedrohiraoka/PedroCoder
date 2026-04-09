@@ -1,0 +1,32 @@
+{
+  "urls": [
+    "https://books.toscrape.com/",
+    "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+    "https://books.toscrape.com/catalogue/sharp-objects_997/index.html"
+  ],
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+  },
+  "delay": 1.0,
+  "timeout": 30,
+  "selectors": {
+    "title": "h1",
+    "price": ".price_color",
+    "availability": ".instock.availability:text",
+    "description": "#product_description + p",
+    "category": ".breadcrumb li:nth-child(3) a",
+    "rating": ".product_main .star-rating::class",
+    "image_src": ".item.active img::attr(src)",
+    "paragraphs": "p:all"
+  },
+  "follow_links": false,
+  "link_selectors": [
+    "article h3 a",
+    ".pager a"
+  ],
+  "max_concurrent": 5,
+  "output_file": "output/scraped_data.json",
+  "output_format": "json"
+}
