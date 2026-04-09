@@ -29,7 +29,6 @@ def check_wget_installed():
 
 
 import time
-import random
 
 def search_files(query, file_types, max_results):
     """Pesquisa arquivos no DuckDuckGo com retry e throttling."""
@@ -41,11 +40,6 @@ def search_files(query, file_types, max_results):
     valid_exts = [EXTENSIONS[ft] for ft in file_types if ft in EXTENSIONS]
     
     results = []
-    user_agents = [
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
-    ]
     
     max_retries = 3
     base_delay = 2
@@ -54,13 +48,13 @@ def search_files(query, file_types, max_results):
         try:
             # Throttling entre tentativas
             if attempt > 0:
-                delay = base_delay * (2 ** attempt) + random.uniform(0.5, 1.5)
-                st.info(f"⏳ Aguardando {delay:.1f}s antes de tentar novamente...")
+                delay = base_delay * (2 ** attempt)
+                st.info(f"⏳ Aguardando {delay}s antes de tentar novamente...")
                 time.sleep(delay)
             
             with DDGS(timeout=10) as ddgs:
-                # User-Agent aleatório para evitar rate limit
-                ddgs._headers['User-Agent'] = random.choice(user_agents)
+                # Versões recentes da duckduckgo-search (v7+) não expõem _headers
+                # A biblioteca gerencia headers internamente
                 
                 for result in ddgs.text(full_query, max_results=max_results * 2):
                     url = result.get('href', '')
