@@ -1,0 +1,84 @@
+# Exemplo de configuração para sites fictícios
+# Adicione novos domínios conforme necessário
+
+# Configurações globais
+global:
+  delay: 1.5                    # Delay entre requisições (segundos)
+  timeout: 30                   # Timeout da requisição (segundos)
+  max_retries: 3                # Número máximo de tentativas
+  user_agent: "Mozilla/5.0 (compatible; DataCrawler/1.0; +https://seusite.com/bot)"
+  max_pages: 100                # Limite máximo de páginas por domínio
+  respect_robots_txt: true      # Respeitar robots.txt
+  recursive: false              # Crawl recursivo padrão
+
+# Templates de extração por domínio
+sites:
+  # Exemplo 1: Diretório de empresas genérico
+  exemplo-empresas.com:
+    listagem:
+      container: "div.company-card"      # Seletor do container de cada item
+      pagination: "a.next-page"          # Seletor do link de próxima página
+    
+    campos:
+      nome: "h2.company-name::text"
+      descricao: "p.description::text"
+      website: "a.website-link@href"
+      email: "span.email::text"
+      telefone: "span.phone::text"
+      endereco: "div.address::text"
+      
+    servicos:
+      container: "ul.services li"
+      campos:
+        nome: "span.service-name::text"
+        preco: "span.price::text"
+        
+  # Exemplo 2: Site com estrutura diferente
+  lista-comercial.br:
+    listagem:
+      container: "article.business-item"
+      pagination: "li.next a"
+    
+    campos:
+      nome: "h3.title::text"
+      descricao: "div.summary::text"
+      email: "a[href^='mailto:']@href"
+      telefone: "div.contact-phone::text"
+      categoria: "span.category::text"
+      
+    precos:
+      container: "div.pricing-table div.plan"
+      campos:
+        plano: "h4.plan-name::text"
+        valor: "span.amount::text"
+        moeda: "span.currency::text"
+
+  # Exemplo 3: Site com XPath (para estruturas complexas)
+  catalogo-industrial.net:
+    use_xpath: true             # Usar XPath em vez de CSS selectors
+    
+    listagem:
+      container: "//div[@class='product-grid']/div[@class='item']"
+      pagination: "//a[contains(@class, 'next')]/@href"
+    
+    campos:
+      nome: ".//h4[@class='product-name']/text()"
+      descricao: ".//p[@class='desc']/text()"
+      contato_email: ".//a[starts-with(@href, 'mailto:')]/@href"
+      contato_telefone: ".//span[@class='tel']/text()"
+      preco_unitario: ".//span[@class='unit-price']/text()"
+
+# Domínios bloqueados (não serão crawled)
+blocked_domains:
+  - gov.br
+  - banco central
+  - dados-sensiveis.com
+
+# Padrões de URL para ignorar
+exclude_patterns:
+  - "/login"
+  - "/admin"
+  - "/api/"
+  - ".pdf$"
+  - ".jpg$"
+  - ".png$"
