@@ -1,4 +1,4 @@
-# Site Cloner MVP
+# Site Cloner v1
 
 Uma ferramenta de linha de comando (CLI) em Python para clonar/espelhar sites estáticos e dinâmicos utilizando `wget` como motor principal de download.
 
