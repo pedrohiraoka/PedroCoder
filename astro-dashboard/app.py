@@ -287,7 +287,7 @@ app.layout = serve_layout
      Output('alert-summary-panel', 'children', allow_duplicate=True),
      Output('event-log', 'children', allow_duplicate=True)],
     Input('interval-voevent', 'n_intervals'),
-    prevent_initial_call=False
+    prevent_initial_call='initial_duplicate'
 )
 def update_alerts(n):
     """Update alert data and visualizations."""
@@ -332,7 +332,7 @@ def update_alerts(n):
     [Output('weather-panel', 'children', allow_duplicate=True),
      Output('observing-conditions', 'children', allow_duplicate=True)],
     Input('interval-weather', 'n_intervals'),
-    prevent_initial_call=False
+    prevent_initial_call='initial_duplicate'
 )
 def update_weather(n):
     """Update weather conditions."""
@@ -353,7 +353,7 @@ def update_weather(n):
     [Output('instrument-panel', 'children', allow_duplicate=True),
      Output('observing-conditions', 'children', allow_duplicate=True)],
     Input('interval-instrument', 'n_intervals'),
-    prevent_initial_call=False
+    prevent_initial_call='initial_duplicate'
 )
 def update_instruments(n):
     """Update instrument status."""
@@ -573,10 +573,15 @@ def export_data(n_clicks, selected_ids):
     return dict(content=csv_data, filename="selected_targets.csv")
 
 
-# Add download component
-app.layout.children = list(app.layout.children) + [
-    dcc.Download(id='download-data')
-]
+# Add download component dynamically in layout
+def serve_layout_with_download():
+    """Serve layout with download component."""
+    layout = serve_layout()
+    # Append download component to the end
+    layout.children.append(dcc.Download(id='download-data'))
+    return layout
+
+app.layout = serve_layout_with_download
 
 
 if __name__ == '__main__':
@@ -584,7 +589,7 @@ if __name__ == '__main__':
     logger.info(f"Configuration: Mock data={config.MOCK_WEATHER_DATA}, Observatory={config.OBSERVATORY_NAME}")
     
     # Run the server
-    app.run_server(
+    app.run(
         host='127.0.0.1',
         port=8050,
         debug=True,
