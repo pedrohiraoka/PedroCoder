@@ -11,6 +11,8 @@ from astropy import units as u
 from astropy.constants import G
 import gala.potential as gp
 from gala.dynamics import Orbit
+from gala.units import UnitSystem
+from gala.integrate import DOPRI853Integrator, LeapfrogIntegrator
 from src.utils.logger import get_logger
 from src.utils.unit_handler import safe_quantity
 
@@ -65,7 +67,7 @@ def create_mw_potential(
     )
 
     # Potencial composto
-    mw_potential = gp.Potential(disk=disk, bulge=bulge, halo=halo)
+    mw_potential = gp.CompositePotential(disk=disk, bulge=bulge, halo=halo)
 
     logger.info(
         f"Potencial MW criado: M_disk={mass_disk:.2e}, M_bulge={mass_bulge:.2e}, "
@@ -121,7 +123,7 @@ def create_m31_potential(
     )
 
     # Potencial composto
-    m31_potential = gp.Potential(disk=disk, bulge=bulge, halo=halo)
+    m31_potential = gp.CompositePotential(disk=disk, bulge=bulge, halo=halo)
 
     logger.info(
         f"Potencial M31 criado: M_disk={mass_disk:.2e}, M_bulge={mass_bulge:.2e}, "
@@ -223,14 +225,19 @@ class OrbitSolver:
         w0 = np.hstack([pos0, vel0])
 
         # Unidades do gala
-        units = gp.UnitSystem(u.kpc, u.Myr, u.Msun, u.radian)
+        units = UnitSystem(u.kpc, u.Myr, u.Msun, u.radian)
 
         # Potencial efetivo para problema de dois corpos
         # Usamos um potencial Kepleriano com massa total reduzida
         effective_potential = gp.KeplerPotential(m=self.total_mass.to(u.Msun).value)
 
         # Integrador
-        integrator_class = getattr(gp.integrate, method, gp.integrate.DOPRI854Integrator)
+        integrator_map = {
+            "DOPRI854": DOPRI853Integrator,
+            "DOPRI853": DOPRI853Integrator,
+            "Leapfrog": LeapfrogIntegrator,
+        }
+        integrator_class = integrator_map.get(method, DOPRI853Integrator)
         integrator = integrator_class(effective_potential, units=units)
 
         # Tempos de integração
