@@ -1,0 +1,30 @@
+# ChatBotAI Configuration
+
+# Ollama AI Engine Settings
+ollama:
+  model_name: llama3.2
+  base_url: http://localhost:11434
+  timeout: 60
+  temperature: 0.7
+  top_p: 0.9
+
+# Memory Settings
+memory:
+  volatile_enabled: true
+  persistent_enabled: false
+  storage_path: ./chatbot_memory
+  max_entries: 1000
+
+# Logging Settings
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  # file: chatbot.log  # Uncomment to enable file logging
+
+# ChatBot Settings
+system_prompt: |
+  You are a helpful, friendly, and knowledgeable assistant.
+  Provide clear, accurate, and concise responses.
+  Be respectful and maintain professional communication.
+
+max_context_messages: 10
