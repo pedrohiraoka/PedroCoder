@@ -1,0 +1,95 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "linux-terminal-assistant"
+version = "0.1.0"
+description = "A professional CLI/TUI assistant for Linux system administrators and developers"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "LTA Team", email = "lta@example.com" }
+]
+keywords = [
+    "linux",
+    "terminal",
+    "cli",
+    "tui",
+    "system-admin",
+    "diagnostics",
+    "automation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "rich>=13.0.0",
+    "typer>=0.9.0",
+    "psutil>=5.9.0",
+    "requests>=2.31.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+]
+downloader = [
+    "yt-dlp>=2023.10.0",
+]
+
+[project.scripts]
+lta = "lta.main:app"
+
+[project.urls]
+Homepage = "https://github.com/example/linux-terminal-assistant"
+Repository = "https://github.com/example/linux-terminal-assistant"
+Documentation = "https://github.com/example/linux-terminal-assistant#readme"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lta"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W", "I", "N", "D", "UP", "YTT", "S", "BLE", "B", "C4", "ISC", "ICN", "PIE", "PT", "Q", "RSE", "RET", "SIM", "TID", "ARG", "DTZ", "ERA", "PD", "PGH", "PLC", "PLE", "PLR", "PLW", "RUF"]
+ignore = ["D100", "D104", "PLR0913"]
+exclude = ["tests/*"]
+
+[tool.ruff.per-file-ignores]
+"src/lta/main.py" = ["E402"]
+"tests/*" = ["S101", "D"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["src/lta/tests"]
+addopts = "-v --cov=lta --cov-report=term-missing"
