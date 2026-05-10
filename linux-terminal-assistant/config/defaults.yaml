@@ -1,0 +1,53 @@
+# Linux Terminal Assistant (LTA) Configuration
+# Copy this file to ~/.config/lta/config.yaml to override defaults
+
+# Network settings for IP lookup and diagnostics
+network:
+  # List of IP lookup backends with fallback order
+  ip_backends:
+    - https://api.ipify.org
+    - https://ifconfig.me/ip
+    - https://icanhazip.com
+  # HTTP request timeout in seconds
+  timeout_seconds: 10
+  # Maximum retry attempts for network requests
+  max_retries: 3
+
+# Downloader (yt-dlp) settings
+downloader:
+  # Default audio format for extraction
+  default_audio_format: mp3
+  # Default video format
+  default_video_format: mp4
+  # Output filename template (yt-dlp syntax)
+  output_template: "%(title)s.%(ext)s"
+  # Prefer free formats when available
+  prefer_free_formats: false
+  # Download rate limit (e.g., "50K", "4.2M", null for unlimited)
+  rate_limit: null
+
+# System monitoring settings
+system:
+  # UI refresh interval in milliseconds
+  refresh_interval_ms: 1000
+  # Default number of log lines to display
+  log_lines_default: 100
+  # Timeout for package manager operations in seconds
+  package_manager_timeout: 300
+
+# User interface settings
+ui:
+  # Enable colored output
+  use_colors: true
+  # Enable Unicode icons in output
+  use_icons: true
+  # Minimum terminal width for full UI
+  width_threshold: 80
+  # Width of progress bars
+  progress_bar_width: 40
+
+# Debug mode enables verbose logging
+debug_mode: false
+
+# Configuration schema version
+config_version: "1.0"
