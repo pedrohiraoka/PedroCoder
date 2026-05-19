@@ -1,0 +1,2 @@
+[console_scripts]
+fastdl = src.cli.main:app
