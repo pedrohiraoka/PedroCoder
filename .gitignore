@@ -1,0 +1,28 @@
+```
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
+
+# Build and distribution artifacts  
+dist/
+build/
+*.egg-info/
+.svn/
+.bzr/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*
+```
