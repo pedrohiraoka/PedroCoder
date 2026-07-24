@@ -1,0 +1,36 @@
+```
+# Cache and temporary files
+.brasa-cache/
+__pycache__/
+*.pyc
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
+
+# Build and distribution
+dist/
+build/
+*.egg
+*.whl
+```
