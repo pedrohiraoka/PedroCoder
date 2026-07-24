@@ -1,0 +1,19 @@
+# Dependências do Projeto - Acompanhamento de Carteira B3
+
+# Coleta de dados fundamentalistas (scraping do Fundamentus)
+pynvest>=1.0.0
+
+# Coleta de dados de mercado e históricos oficiais da B3
+brasa-marketdata>=0.1.0
+
+# Manipulação e análise de dados
+pandas>=2.0.0
+
+# Interface CLI rica e visual
+rich>=13.0.0
+
+# Tipos e validações (já incluso no Python 3.10+, mas útil para runtime)
+typing-extensions>=4.0.0
+
+# Utilitários para datas
+python-dateutil>=2.8.0
