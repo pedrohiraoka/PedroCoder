@@ -1,0 +1,5 @@
+pynvest>=0.1.2
+requests>=2.32.4
+beautifulsoup4>=4.13.4
+lxml>=5.0.0
+pandas>=2.0.0
