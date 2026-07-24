@@ -1,0 +1,20 @@
+Requirement already satisfied: pynvest in /usr/local/lib/python3.12/site-packages (0.1.2)
+Requirement already satisfied: requests in /usr/local/lib/python3.12/site-packages (from pynvest) (2.32.4)
+Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.12/site-packages (from pynvest) (4.13.4)
+Requirement already satisfied: lxml in /usr/local/lib/python3.12/site-packages (from pynvest) (6.0.0)
+Requirement already satisfied: pandas in /usr/local/lib/python3.12/site-packages (from pynvest) (2.3.1)
+Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.12/site-packages (from beautifulsoup4->pynvest) (2.7)
+Requirement already satisfied: typing-extensions>=4.0.0 in /usr/local/lib/python3.12/site-packages (from beautifulsoup4->pynvest) (4.14.1)
+Requirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.12/site-packages (from pandas->pynvest) (2.3.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/site-packages (from pandas->pynvest) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.12/site-packages (from pandas->pynvest) (2025.2)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.12/site-packages (from pandas->pynvest) (2025.2)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/site-packages (from requests->pynvest) (3.4.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/site-packages (from requests->pynvest) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/site-packages (from requests->pynvest) (2.5.0)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/site-packages (from requests->pynvest) (2025.7.14)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas->pynvest) (1.17.0)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+
+[notice] A new release of pip is available: 25.0.1 -> 26.1.2
+[notice] To update, run: pip install --upgrade pip
