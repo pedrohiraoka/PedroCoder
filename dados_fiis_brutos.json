@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "data_extracao": "2026-07-24T20:44:02.897746+00:00",
+    "fonte": "Fundamentus (via pynvest/scraper)",
+    "total_tickers_solicitados": 2,
+    "total_tickers_sucesso": 2,
+    "total_tickers_falha": 0
+  },
+  "fiis": {
+    "MXRF11": {
+      "status": "sucesso",
+      "dados_gerais": {
+        "nome": "MAXI RENDA FUNDO DE INVESTIMENTO IMOBILIÁRIO - FII - RESPONSABILIDADE LIMITADA",
+        "segmento": "Logística",
+        "data_ult_cot": "23/07/2026"
+      },
+      "mercado": {
+        "cotacao": 9.66,
+        "valor_mercado": 4446200000.0,
+        "nro_cotas": 460269531.0,
+        "vp_cota": 9.37
+      },
+      "indicadores": {
+        "p_vp": 1.03,
+        "dividend_yield": 13.3,
+        "ffo_yield": 10.87,
+        "liquidez_media_diaria": 14776000.0
+      },
+      "oscilacoes": {
+        "dia": -0.21,
+        "mes": -0.51,
+        "doze_meses": 15.27
+      },
+      "ultimo_rendimento": {
+        "valor": 1.18,
+        "data": null
+      }
+    },
+    "XPML11": {
+      "status": "sucesso",
+      "dados_gerais": {
+        "nome": "XP MALLS FUNDO DE INVESTIMENTO IMOBILIÁRIO FII",
+        "segmento": "Shoppings",
+        "data_ult_cot": "23/07/2026"
+      },
+      "mercado": {
+        "cotacao": 104.22,
+        "valor_mercado": 6702190000.0,
+        "nro_cotas": 64308055.0,
+        "vp_cota": 109.39
+      },
+      "indicadores": {
+        "p_vp": 0.95,
+        "dividend_yield": 10.4,
+        "ffo_yield": 7.86,
+        "liquidez_media_diaria": 15615300.0
+      },
+      "oscilacoes": {
+        "dia": -0.34,
+        "mes": 0.63,
+        "doze_meses": 14.54
+      },
+      "ultimo_rendimento": {
+        "valor": 10.3,
+        "data": null
+      }
+    }
+  }
+}
