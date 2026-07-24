@@ -1,0 +1,3 @@
+brasa-marketdata>=0.1.0
+pynvest>=0.1.0
+pandas>=2.0.0
